@@ -32,7 +32,7 @@ func NewSelfUpgradeCmd(org, repo, name string, customDownloadFunc CustomDownload
 		Short: fmt.Sprintf("Upgrade %s itself", name),
 		Long: fmt.Sprintf(`Upgrade %s itself
 You can use any exists version to upgrade %s itself. If there's no argument given, it will upgrade to the latest release.
-You can upgrade to the latest developing version, please use it like: %s version upgrade dev'`, name, name),
+You can upgrade to the latest developing version, please use it like: %s version upgrade dev'`, name, name, name),
 		RunE: opt.RunE,
 	}
 	opt.addFlags(cmd.Flags())
@@ -121,6 +121,7 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 			o.downloadCount(version, runtime.GOOS)
 		}()
 	}
+	cmd.Println("start to download from", fileURL)
 
 	defer func() {
 		_ = os.RemoveAll(output)
@@ -138,14 +139,14 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 	}
 
 	if err = o.extractFiles(output); err == nil {
-		err = o.overWriteJCLI(fmt.Sprintf("%s/%s", filepath.Dir(output), o.Name), targetPath)
+		err = o.overWriteBinary(fmt.Sprintf("%s/%s", filepath.Dir(output), o.Name), targetPath)
 	} else {
 		err = fmt.Errorf("cannot extract %s from tar file, error: %v", o.Name, err)
 	}
 	return
 }
 
-func (o *SelfUpgradeOption) overWriteJCLI(sourceFile, targetPath string) (err error) {
+func (o *SelfUpgradeOption) overWriteBinary(sourceFile, targetPath string) (err error) {
 	switch runtime.GOOS {
 	case "linux":
 		var cp string
