@@ -112,7 +112,7 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 	var fileURL string
 	if o.CustomDownloadFunc == nil {
 		fileURL = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/%s-%s-%s.tar.gz",
-			o.Org, o.Name, version, runtime.GOOS, runtime.GOARCH)
+			o.Org, o.Repo, version, o.Name, runtime.GOOS, runtime.GOARCH)
 	} else {
 		fileURL = o.CustomDownloadFunc(version)
 
@@ -165,7 +165,7 @@ func (o *SelfUpgradeOption) overWriteBinary(sourceFile, targetPath string) (err 
 
 func (o *SelfUpgradeOption) downloadCount(version string, arch string) {
 	countURL := fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/%s-%s-%s.tar.gz",
-		o.Org, o.Name, version, runtime.GOOS, runtime.GOARCH)
+		o.Org, o.Repo, version, o.Name, runtime.GOOS, runtime.GOARCH)
 
 	if tempDir, err := ioutil.TempDir(".", "download-count"); err == nil {
 		tempFile := tempDir + fmt.Sprintf("/%s.tar.gz", o.Name)
