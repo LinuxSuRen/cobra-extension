@@ -42,7 +42,7 @@ Get more details about onmyzsh from https://github.com/ohmyzsh/ohmyzsh
 Load the %s completion code for zsh[1] into the current shell
 source <(%s completion --type zsh)
 Set the %s completion code for zsh[1] to autoload on startup
-%s completion --type zsh > "${fpath[1]}/_%s"`, rootName, rootName, rootName, rootName, rootName, rootName),
+%s completion --type zsh > "${fpath[1]}/_%s"`, rootName, rootName, rootName, rootName, rootName, rootName, rootName),
 		RunE: func(cmd *cobra.Command, _ []string) (err error) {
 			shellType := completionOptions.Type
 			switch shellType {
