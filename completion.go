@@ -25,24 +25,38 @@ func NewCompletionCmd(rootCmd *cobra.Command) (cmd *cobra.Command) {
 		Short: "Generate shell completion scripts",
 		Long: fmt.Sprintf(`Generate shell completion scripts
 Normally you don't need to do more extra work to have this feature if you've installed %s by brew`, rootName),
-		Example: fmt.Sprintf(`Installing bash completion on macOS using homebrew
-If running Bash 3.2 included with macOS
+		Example: fmt.Sprintf(`# Installing bash completion on macOS using homebrew
+## If running Bash 3.2 included with macOS
 brew install bash-completion
-or, if running Bash 4.1+
+## or, if running Bash 4.1+
 brew install bash-completion@2
-You may need to add the completion to your completion directory by the following command
-%s completion > $(brew --prefix)/etc/bash_completion.d/%s
-If you get trouble, please visit https://github.com/jenkins-zh/jenkins-cli/issues/83.
+## If %[1]s is installed via homebrew, this should start working immediately.
+## If you've installed via other means, you may need add the completion to your completion directory
+%[1]s completion > $(brew --prefix)/etc/bash_completion.d/%[1]s
+## If you get trouble, please visit https://github.com/jenkins-zh/jenkins-cli/issues/83
 
-In order to have good experience on zsh completion, ohmyzsh is a good choice.
-Please install ohmyzsh by the following command
+# Installing bash completion on Linux
+## If bash-completion is not installed on Linux, please install the 'bash-completion' package
+## via your distribution's package manager.
+## Load the %[1]s completion code for bash into the current shell
+source <(%[1]s completion bash)
+## Write bash completion code to a file and source if from .bash_profile
+mkdir -p ~/.config/%[1]s/ && %[1]s completion bash > ~/.config/%[1]s/completion.bash.inc
+printf "
+# %[1]s shell completion
+source '$HOME/.config/%[1]s/completion.bash.inc'
+" >> $HOME/.bash_profile
+source $HOME/.bash_profile
+
+# In order to have good experience on zsh completion, ohmyzsh is a good choice.
+# Please install ohmyzsh by the following command
 sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)"
-Get more details about onmyzsh from https://github.com/ohmyzsh/ohmyzsh
+# Get more details about onmyzsh from https://github.com/ohmyzsh/ohmyzsh
 
-Load the %s completion code for zsh[1] into the current shell
-source <(%s completion --type zsh)
-Set the %s completion code for zsh[1] to autoload on startup
-%s completion --type zsh > "${fpath[1]}/_%s"`, rootName, rootName, rootName, rootName, rootName, rootName, rootName),
+# Load the %[1]s completion code for zsh[1] into the current shell
+source <(%[1]s completion --type zsh)
+# Set the %[1]s completion code for zsh[1] to autoload on startup
+%[1]s completion --type zsh > "${fpath[1]}/_%[1]s"`, rootName),
 		RunE: func(cmd *cobra.Command, _ []string) (err error) {
 			shellType := completionOptions.Type
 			switch shellType {
