@@ -5,6 +5,7 @@ import (
 	"compress/gzip"
 	"fmt"
 	"github.com/google/go-github/v29/github"
+	"github.com/linuxsuren/cobra-extension/common"
 	gh "github.com/linuxsuren/cobra-extension/github"
 	httpdownloader "github.com/linuxsuren/http-downloader/pkg"
 	"github.com/spf13/cobra"
@@ -76,8 +77,18 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 		}
 		return
 	}
-	f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 
+	currentVersion := GetVersion()
+	err = o.Download(cmd, version, currentVersion, targetPath)
+	return
+}
+
+// Download downloads the binary file from GitHub release
+// Org, Repo, Name is necessary
+func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion, targetPath string) (err error) {
 	// try to understand the version from user input
 	switch version {
 	case "dev":
@@ -98,12 +109,11 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 	}
 
 	// version review
-	currentVersion := GetVersion()
 	if currentVersion == version {
-		cmd.Printf("no need to upgrade %s\n", o.Name)
+		log.Printf("no need to upgrade %s\n", o.Name)
 		return
 	}
-	cmd.Println(fmt.Sprintf("prepare to upgrade to %s", version))
+	log.Println(fmt.Sprintf("prepare to upgrade to %s", version))
 
 	// download the tar file of target file
 	tmpDir := os.TempDir()
@@ -121,7 +131,7 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 			o.downloadCount(version, runtime.GOOS)
 		}()
 	}
-	cmd.Println("start to download from", fileURL)
+	log.Println("start to download from", fileURL)
 
 	defer func() {
 		_ = os.RemoveAll(output)
