@@ -77,7 +77,9 @@ func (o *SelfUpgradeOption) RunE(cmd *cobra.Command, args []string) (err error) 
 		}
 		return
 	}
-	f.Close()
+	defer func() {
+		_ = f.Close()
+	}()
 
 	currentVersion := GetVersion()
 	err = o.Download(cmd, version, currentVersion, targetPath)
