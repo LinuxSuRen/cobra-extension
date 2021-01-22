@@ -11,7 +11,10 @@ import (
 
 // NewVersionCmd create a command for version
 func NewVersionCmd(org, repo, name string, customDownloadFunc CustomDownloadFunc) (cmd *cobra.Command) {
-	opt := &PrintOption{}
+	opt := &PrintOption{
+		Org:  org,
+		Repo: repo,
+	}
 
 	cmd = &cobra.Command{
 		Use:   "version",
@@ -47,6 +50,8 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 
 	ghClient := &gh.GitHubReleaseClient{
 		Client: github.NewClient(nil),
+		Org:    o.Org,
+		Repo:   o.Repo,
 	}
 	var asset *gh.ReleaseAsset
 	if o.Changelog {
@@ -54,7 +59,9 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 			cmd.Println()
 			cmd.Println(asset.Body)
 		}
-	} else if o.ShowLatest {
+	}
+
+	if o.ShowLatest {
 		if asset, err = ghClient.GetLatestJCLIAsset(); err == nil && asset != nil {
 			cmd.Println()
 			cmd.Println(asset.TagName)

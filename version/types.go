@@ -10,6 +10,9 @@ import (
 type PrintOption struct {
 	Changelog  bool
 	ShowLatest bool
+
+	Org  string
+	Repo string
 }
 
 type CustomDownloadFunc func(string) string
