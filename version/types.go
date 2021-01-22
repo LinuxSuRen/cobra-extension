@@ -22,6 +22,8 @@ type SelfUpgradeOption struct {
 	Repo               string
 	Name               string
 	CustomDownloadFunc CustomDownloadFunc
+	PathSeparate       string
+	Thread             int
 
 	GitHubClient *github.Client
 	RoundTripper http.RoundTripper
