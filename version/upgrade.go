@@ -45,6 +45,8 @@ func (o *SelfUpgradeOption) addFlags(flags *pflag.FlagSet) {
 		fmt.Sprintf("If you want to show the progress of download %s", o.Name))
 	flags.BoolVarP(&o.Privilege, "privilege", "", true,
 		fmt.Sprintf("Try to take the privilege from system if there's no write permission on %s", o.Name))
+	flags.IntVarP(&o.Thread, "thread", "t", 0,
+		"Download the target binary file in multi-thread mode. It only works when its value is bigger than 1")
 }
 
 // RunE is the main point of current command
@@ -119,10 +121,14 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 	tmpDir := os.TempDir()
 	output := fmt.Sprintf("%s/%s.tar.gz", tmpDir, o.Name)
 
+	if o.PathSeparate == "" {
+		o.PathSeparate = "-"
+	}
+
 	var fileURL string
 	if o.CustomDownloadFunc == nil {
-		fileURL = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/%s-%s-%s.tar.gz",
-			o.Org, o.Repo, version, o.Name, runtime.GOOS, runtime.GOARCH)
+		fileURL = fmt.Sprintf("https://github.com/%s/%s/releases/download/%s/%s%s%s%s%s.tar.gz",
+			o.Org, o.Repo, version, o.Name, o.PathSeparate, runtime.GOOS, o.PathSeparate, runtime.GOARCH)
 	} else {
 		fileURL = o.CustomDownloadFunc(version)
 
@@ -137,15 +143,23 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 		_ = os.RemoveAll(output)
 	}()
 
-	downloader := httpdownloader.HTTPDownloader{
-		RoundTripper:   o.RoundTripper,
-		TargetFilePath: output,
-		URL:            fileURL,
-		ShowProgress:   o.ShowProgress,
-	}
-	if err = downloader.DownloadFile(); err != nil {
-		err = fmt.Errorf("cannot download %s from %s, error: %v", o.Name, fileURL, err)
-		return
+	if o.Thread > 1 {
+		if err = httpdownloader.DownloadFileWithMultipleThread(fileURL, output, o.Thread, o.ShowProgress); err != nil {
+			err = fmt.Errorf("cannot download %s from %s, error: %v", o.Name, fileURL, err)
+			return
+		}
+	} else {
+		// keep this exists, it can avoid error due to the new feature
+		downloader := httpdownloader.HTTPDownloader{
+			RoundTripper:   o.RoundTripper,
+			TargetFilePath: output,
+			URL:            fileURL,
+			ShowProgress:   o.ShowProgress,
+		}
+		if err = downloader.DownloadFile(); err != nil {
+			err = fmt.Errorf("cannot download %s from %s, error: %v", o.Name, fileURL, err)
+			return
+		}
 	}
 
 	if err = o.extractFiles(output); err == nil {
