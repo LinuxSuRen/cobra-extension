@@ -65,7 +65,7 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 		if asset, err = ghClient.GetLatestJCLIAsset(); err == nil && asset != nil {
 			cmd.Println()
 			cmd.Println(asset.TagName)
-			cmd.Println(asset.Body)
+			//cmd.Println(asset.Body)
 		}
 	}
 	return
