@@ -24,7 +24,7 @@ jobs:
           args: check
       - name: Build
         run: |
-         make build
+          go build
   GoLint:
     name: Lint
     runs-on: ubuntu-latest
