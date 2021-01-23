@@ -97,7 +97,7 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 		version = "master"
 	case "":
 		o.GitHubClient = github.NewClient(nil)
-		ghClient := &gh.GitHubReleaseClient{
+		ghClient := &gh.ReleaseClient{
 			Client: o.GitHubClient,
 			Org:    o.Org,
 			Repo:   o.Repo,

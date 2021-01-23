@@ -7,7 +7,7 @@ import (
 )
 
 func TestInit(t *testing.T) {
-	ghClient := jClient.GitHubReleaseClient{}
+	ghClient := jClient.ReleaseClient{}
 
 	assert.Nil(t, ghClient.Client)
 	ghClient.Init()
@@ -18,7 +18,7 @@ func TestGetLatestReleaseAsset(t *testing.T) {
 	client, teardown := jClient.PrepareForGetLatestReleaseAsset() //setup()
 	defer teardown()
 
-	ghClient := jClient.GitHubReleaseClient{
+	ghClient := jClient.ReleaseClient{
 		Client: client,
 	}
 	asset, err := ghClient.GetLatestReleaseAsset("o", "r")
@@ -33,7 +33,7 @@ func TestGetLatestJCLIAsset(t *testing.T) {
 	client, teardown := jClient.PrepareForGetLatestJCLIAsset() //setup()
 	defer teardown()
 
-	ghClient := jClient.GitHubReleaseClient{
+	ghClient := jClient.ReleaseClient{
 		Client: client,
 	}
 	asset, err := ghClient.GetLatestJCLIAsset()
@@ -48,7 +48,7 @@ func TestGetJCLIAsset(t *testing.T) {
 	client, teardown := jClient.PrepareForGetJCLIAsset("tagName") //setup()
 	defer teardown()
 
-	ghClient := jClient.GitHubReleaseClient{
+	ghClient := jClient.ReleaseClient{
 		Client: client,
 	}
 	asset, err := ghClient.GetJCLIAsset("tagName")
@@ -63,7 +63,7 @@ func TestGetReleaseAssetByTagName(t *testing.T) {
 	client, teardown := jClient.PrepareForGetReleaseAssetByTagName() //setup()
 	defer teardown()
 
-	ghClient := jClient.GitHubReleaseClient{
+	ghClient := jClient.ReleaseClient{
 		Client: client,
 	}
 	asset, err := ghClient.GetReleaseAssetByTagName("jenkins-zh", "jenkins-cli", "tagName")

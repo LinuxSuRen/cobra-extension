@@ -7,7 +7,7 @@ import (
 	"testing"
 )
 
-func TestAll(t *testing.T)  {
+func TestAll(t *testing.T) {
 	gomega.RegisterFailHandler(ginkgo.Fail)
 	reporter := reporters.NewJUnitReporter("test.xml")
 	ginkgo.RunSpecsWithDefaultAndCustomReporters(t, "", []ginkgo.Reporter{reporter})
