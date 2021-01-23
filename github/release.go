@@ -5,8 +5,8 @@ import (
 	"github.com/google/go-github/v29/github"
 )
 
-// GitHubReleaseClient is the client of jcli github
-type GitHubReleaseClient struct {
+// ReleaseClient is the client of jcli github
+type ReleaseClient struct {
 	Client *github.Client
 	Org    string
 	Repo   string
@@ -19,17 +19,17 @@ type ReleaseAsset struct {
 }
 
 // Init init the GitHub client
-func (g *GitHubReleaseClient) Init() {
+func (g *ReleaseClient) Init() {
 	g.Client = github.NewClient(nil)
 }
 
 // GetLatestJCLIAsset returns the latest jcli asset
-func (g *GitHubReleaseClient) GetLatestJCLIAsset() (*ReleaseAsset, error) {
+func (g *ReleaseClient) GetLatestJCLIAsset() (*ReleaseAsset, error) {
 	return g.GetLatestReleaseAsset(g.Org, g.Repo)
 }
 
 // GetLatestReleaseAsset returns the latest release asset
-func (g *GitHubReleaseClient) GetLatestReleaseAsset(owner, repo string) (ra *ReleaseAsset, err error) {
+func (g *ReleaseClient) GetLatestReleaseAsset(owner, repo string) (ra *ReleaseAsset, err error) {
 	ctx := context.Background()
 
 	var release *github.RepositoryRelease
@@ -43,12 +43,12 @@ func (g *GitHubReleaseClient) GetLatestReleaseAsset(owner, repo string) (ra *Rel
 }
 
 // GetJCLIAsset returns the asset from a tag name
-func (g *GitHubReleaseClient) GetJCLIAsset(tagName string) (*ReleaseAsset, error) {
+func (g *ReleaseClient) GetJCLIAsset(tagName string) (*ReleaseAsset, error) {
 	return g.GetReleaseAssetByTagName(g.Org, g.Repo, tagName)
 }
 
 // GetReleaseAssetByTagName returns the release asset by tag name
-func (g *GitHubReleaseClient) GetReleaseAssetByTagName(owner, repo, tagName string) (ra *ReleaseAsset, err error) {
+func (g *ReleaseClient) GetReleaseAssetByTagName(owner, repo, tagName string) (ra *ReleaseAsset, err error) {
 	ctx := context.Background()
 
 	opt := &github.ListOptions{

@@ -48,7 +48,7 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 		version = strings.ReplaceAll(version, "dev-", "")
 	}
 
-	ghClient := &gh.GitHubReleaseClient{
+	ghClient := &gh.ReleaseClient{
 		Client: github.NewClient(nil),
 		Org:    o.Org,
 		Repo:   o.Repo,

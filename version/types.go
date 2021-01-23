@@ -15,6 +15,7 @@ type PrintOption struct {
 	Repo string
 }
 
+// CustomDownloadFunc is the function interface for custom download URL
 type CustomDownloadFunc func(string) string
 
 // SelfUpgradeOption is the option for self upgrade command

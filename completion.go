@@ -17,6 +17,7 @@ var ShellTypes = []string{
 
 var completionOptions CompletionOptions
 
+// NewCompletionCmd creates the completion command
 func NewCompletionCmd(rootCmd *cobra.Command) (cmd *cobra.Command) {
 	rootName := rootCmd.Name()
 
