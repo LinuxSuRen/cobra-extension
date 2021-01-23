@@ -31,9 +31,9 @@ func NewVersionCmd(org, repo, name string, customDownloadFunc CustomDownloadFunc
 }
 
 func (o *PrintOption) addFlags(flags *pflag.FlagSet) {
-	flags.BoolVarP(&o.Changelog, "changelog", "", false,
-		"Output the changelog of current version")
-	flags.BoolVarP(&o.ShowLatest, "show-latest", "", false,
+	flags.BoolVarP(&o.Changelog, "changelog", "c", false,
+		"Output the changelog")
+	flags.BoolVarP(&o.ShowLatest, "show-latest", "s", false,
 		"Output the latest version")
 }
 
@@ -54,18 +54,21 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 		Repo:   o.Repo,
 	}
 	var asset *gh.ReleaseAsset
-	if o.Changelog {
+	if o.Changelog && !o.ShowLatest {
+		// only print the changelog of current version
 		if asset, err = ghClient.GetJCLIAsset(version); err == nil && asset != nil {
-			cmd.Println()
+			cmd.Println("Changelog:")
 			cmd.Println(asset.Body)
 		}
 	}
 
 	if o.ShowLatest {
 		if asset, err = ghClient.GetLatestJCLIAsset(); err == nil && asset != nil {
-			cmd.Println()
-			cmd.Println(asset.TagName)
-			//cmd.Println(asset.Body)
+			cmd.Println("The latest version", asset.TagName)
+			if o.Changelog {
+				cmd.Println("Changelog:")
+				cmd.Println(asset.Body)
+			}
 		}
 	}
 	return
