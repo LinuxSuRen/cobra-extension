@@ -16,6 +16,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"syscall"
 )
 
@@ -111,7 +112,7 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 	}
 
 	// version review
-	if currentVersion == version {
+	if strings.TrimPrefix(currentVersion, "v") == strings.TrimPrefix(version, "v") {
 		log.Printf("no need to upgrade %s\n", o.Name)
 		return
 	}
@@ -132,10 +133,13 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 	} else {
 		fileURL = o.CustomDownloadFunc(version)
 
-		// make sure we count the download action
-		go func() {
-			o.downloadCount(version, runtime.GOOS)
-		}()
+		// only do the count when the source is not belong to github.com
+		if !strings.HasPrefix(fileURL, "https://github.com") {
+			// make sure we count the download action
+			go func() {
+				o.downloadCount(version, runtime.GOOS)
+			}()
+		}
 	}
 	log.Println("start to download from", fileURL)
 
