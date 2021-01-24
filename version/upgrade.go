@@ -48,8 +48,6 @@ func (o *SelfUpgradeOption) addFlags(flags *pflag.FlagSet) {
 		fmt.Sprintf("Try to take the privilege from system if there's no write permission on %s", o.Name))
 	flags.IntVarP(&o.Thread, "thread", "t", 0,
 		"Download the target binary file in multi-thread mode. It only works when its value is bigger than 1")
-	flags.IntVarP(&o.Thread, "", "6", 6,
-		"Download the target binary file in multi-thread mode. It only works when its value is bigger than 1")
 }
 
 // RunE is the main point of current command
