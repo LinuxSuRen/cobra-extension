@@ -2,7 +2,6 @@ package pkg
 
 import (
 	"github.com/golang/mock/gomock"
-	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
 

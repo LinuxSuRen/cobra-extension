@@ -1,13 +1,18 @@
 package pkg
 
 import (
+	"bytes"
 	"fmt"
+	"github.com/mitchellh/go-homedir"
 	"github.com/spf13/cobra"
+	"os"
+	"path"
 )
 
-// CompletionOptions is the option of completion command
-type CompletionOptions struct {
-	Type string
+// completionOptions is the option of completion command
+type completionOptions struct {
+	shellType string
+	auto      bool
 }
 
 // ShellTypes contains all types of shell
@@ -15,11 +20,10 @@ var ShellTypes = []string{
 	"zsh", "bash", "powerShell",
 }
 
-var completionOptions CompletionOptions
-
 // NewCompletionCmd creates the completion command
 func NewCompletionCmd(rootCmd *cobra.Command) (cmd *cobra.Command) {
 	rootName := rootCmd.Name()
+	opt := completionOptions{}
 
 	cmd = &cobra.Command{
 		Use:   "completion",
@@ -58,25 +62,14 @@ sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/too
 source <(%[1]s completion --type zsh)
 # Set the %[1]s completion code for zsh[1] to autoload on startup
 %[1]s completion --type zsh > "${fpath[1]}/_%[1]s"`, rootName),
-		RunE: func(cmd *cobra.Command, _ []string) (err error) {
-			shellType := completionOptions.Type
-			switch shellType {
-			case "zsh":
-				err = rootCmd.GenZshCompletion(cmd.OutOrStdout())
-			case "powerShell":
-				err = rootCmd.GenPowerShellCompletion(cmd.OutOrStdout())
-			case "bash":
-				err = rootCmd.GenBashCompletion(cmd.OutOrStdout())
-			default:
-				err = fmt.Errorf("unknown shell type %s", shellType)
-			}
-			return
-		},
+		RunE: opt.runE,
 	}
 
 	flags := cmd.Flags()
-	flags.StringVarP(&completionOptions.Type, "type", "", "bash",
+	flags.StringVarP(&opt.shellType, "type", "", "bash",
 		fmt.Sprintf("Generate different types of shell which are %v", ShellTypes))
+	flags.BoolVarP(&opt.auto, "auto", "", true,
+		"Indicate if install the completion script automatically, print the script if it's false")
 
 	err := cmd.RegisterFlagCompletionFunc("type", func(cmd *cobra.Command, args []string, toComplete string) (
 		i []string, directive cobra.ShellCompDirective) {
@@ -86,4 +79,73 @@ source <(%[1]s completion --type zsh)
 		cmd.PrintErrf("register flag type for sub-command doc failed %#v\n", err)
 	}
 	return
+}
+
+func (o *completionOptions) runE(cmd *cobra.Command, _ []string) (err error) {
+	rootCmd := cmd.Root()
+	writer := cmd.OutOrStdout()
+	buf := bytes.NewBuffer([]byte{})
+	if o.auto {
+		writer = buf
+	}
+
+	shellType := o.shellType
+	switch shellType {
+	case "zsh":
+		err = rootCmd.GenZshCompletion(writer)
+	case "powerShell":
+		err = rootCmd.GenPowerShellCompletion(writer)
+	case "bash":
+		err = rootCmd.GenBashCompletion(writer)
+	default:
+		err = fmt.Errorf("unknown shell type %s", shellType)
+	}
+
+	if err == nil && o.auto {
+		err = installCompletionScript(rootCmd.Use, buf.Bytes())
+	}
+	return
+}
+
+func installCompletionScript(name string, script []byte) (err error) {
+	// create ~/.bash_completion if it does not exist or is empty
+	if err = writeIfNotExist("~/.bash_completion", []byte(`
+for bcfile in ~/.bash_completion.d/* ; do
+  . $bcfile
+done`), false); err != nil {
+		return
+	}
+
+	// install script for the current command to '~/.bash_completion.d/cmd'
+	if err = writeIfNotExist(fmt.Sprintf("~/.bash_completion.d/%s", name), script, true); err != nil {
+		return
+	}
+	return
+}
+
+func writeIfNotExist(requestPath string, data []byte, force bool) (err error) {
+	var targetPath string
+	if targetPath, err = homedir.Expand(requestPath); err != nil {
+		return
+	}
+
+	var ok bool
+	if ok, err = pathExists(targetPath); !ok || err != nil || force {
+		if err = os.MkdirAll(path.Dir(targetPath), os.FileMode(0755)); err != nil {
+			return
+		}
+		err = os.WriteFile(targetPath, data, 0644)
+	}
+	return
+}
+
+func pathExists(path string) (bool, error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
 }
