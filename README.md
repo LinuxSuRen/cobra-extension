@@ -5,7 +5,7 @@
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/linuxsuren/cobra-extension)
 [![HitCount](http://hits.dwyl.com/linuxsuren/cobra-extension.svg)](http://hits.dwyl.com/linuxsuren/cobra-extension)
 
-This project aims to provide an easy way to let you writing a plugin for your CLI project.
+This project aims to provide an easy way to let you writing a plugin for your CLI project. And it based on [cobra](https://github.com/spf13/cobra).
 
 # Get started
 
