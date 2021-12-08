@@ -17,10 +17,11 @@ func NewVersionCmd(org, repo, name string, customDownloadFunc CustomDownloadFunc
 	}
 
 	cmd = &cobra.Command{
-		Use:   "version",
-		Short: fmt.Sprintf("Print the version of %s", name),
-		Long:  fmt.Sprintf("Print the version of %s", name),
-		RunE:  opt.RunE,
+		Use:     "version",
+		Aliases: []string{"ver"},
+		Short:   fmt.Sprintf("Print the version of %s", name),
+		Long:    fmt.Sprintf("Print the version of %s", name),
+		RunE:    opt.RunE,
 	}
 
 	flags := cmd.Flags()
@@ -43,6 +44,7 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 	cmd.Printf("Version: %s\n", version)
 	cmd.Printf("Last Commit: %s\n", GetCommit())
 	cmd.Printf("Build Date: %s\n", GetDate())
+	cmd.Printf("https://github.com/%s/%s", o.Org, o.Repo)
 
 	if strings.HasPrefix(version, "dev-") {
 		version = strings.ReplaceAll(version, "dev-", "")
