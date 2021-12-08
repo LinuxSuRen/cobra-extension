@@ -30,8 +30,9 @@ func NewSelfUpgradeCmd(org, repo, name string, customDownloadFunc CustomDownload
 	}
 
 	cmd = &cobra.Command{
-		Use:   "upgrade",
-		Short: fmt.Sprintf("Upgrade %s itself", name),
+		Use:     "upgrade",
+		Aliases: []string{"up"},
+		Short:   fmt.Sprintf("Upgrade %s itself", name),
 		Long: fmt.Sprintf(`Upgrade %s itself
 You can use any exists version to upgrade %s itself. If there's no argument given, it will upgrade to the latest release.
 You can upgrade to the latest developing version, please use it like: %s version upgrade dev'`, name, name, name),
