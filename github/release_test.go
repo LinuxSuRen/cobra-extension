@@ -29,36 +29,6 @@ func TestGetLatestReleaseAsset(t *testing.T) {
 	assert.Equal(t, "body", asset.Body)
 }
 
-func TestGetLatestJCLIAsset(t *testing.T) {
-	client, teardown := jClient.PrepareForGetLatestJCLIAsset() //setup()
-	defer teardown()
-
-	ghClient := jClient.ReleaseClient{
-		Client: client,
-	}
-	asset, err := ghClient.GetLatestJCLIAsset()
-
-	assert.Nil(t, err)
-	assert.NotNil(t, asset)
-	assert.Equal(t, "tagName", asset.TagName)
-	assert.Equal(t, "body", asset.Body)
-}
-
-func TestGetJCLIAsset(t *testing.T) {
-	client, teardown := jClient.PrepareForGetJCLIAsset("tagName") //setup()
-	defer teardown()
-
-	ghClient := jClient.ReleaseClient{
-		Client: client,
-	}
-	asset, err := ghClient.GetJCLIAsset("tagName")
-
-	assert.Nil(t, err)
-	assert.NotNil(t, asset)
-	assert.Equal(t, "tagName", asset.TagName)
-	assert.Equal(t, "body", asset.Body)
-}
-
 func TestGetReleaseAssetByTagName(t *testing.T) {
 	client, teardown := jClient.PrepareForGetReleaseAssetByTagName() //setup()
 	defer teardown()
