@@ -105,7 +105,7 @@ func (o *SelfUpgradeOption) Download(log common.Printer, version, currentVersion
 			Org:    o.Org,
 			Repo:   o.Repo,
 		}
-		if asset, assetErr := ghClient.GetLatestJCLIAsset(); assetErr == nil && asset != nil {
+		if asset, assetErr := ghClient.GetLatestReleaseAsset(o.Org, o.Repo); assetErr == nil && asset != nil {
 			version = asset.TagName
 		} else {
 			err = fmt.Errorf("cannot get the latest version, error: %s", assetErr)

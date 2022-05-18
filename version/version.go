@@ -65,7 +65,7 @@ func (o *PrintOption) RunE(cmd *cobra.Command, _ []string) (err error) {
 	}
 
 	if o.ShowLatest {
-		if asset, err = ghClient.GetLatestJCLIAsset(); err == nil && asset != nil {
+		if asset, err = ghClient.GetLatestReleaseAsset(o.Org, o.Repo); err == nil && asset != nil {
 			cmd.Println("The latest version", asset.TagName)
 			if o.Changelog {
 				cmd.Println("Changelog:")
