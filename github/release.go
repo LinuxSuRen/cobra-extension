@@ -5,7 +5,7 @@ import (
 	"github.com/google/go-github/v29/github"
 )
 
-// ReleaseClient is the client of jcli github
+// ReleaseClient is the client of GitHub
 type ReleaseClient struct {
 	Client *github.Client
 	Org    string
@@ -18,14 +18,20 @@ type ReleaseAsset struct {
 	Body    string
 }
 
-// Init init the GitHub client
-func (g *ReleaseClient) Init() {
-	g.Client = github.NewClient(nil)
+// Release represents a GitHub release
+type Release struct {
+	TagName string
+	ID      int64
 }
 
-// GetLatestJCLIAsset returns the latest jcli asset
-func (g *ReleaseClient) GetLatestJCLIAsset() (*ReleaseAsset, error) {
-	return g.GetLatestReleaseAsset(g.Org, g.Repo)
+// Tag represents a tag of a git repository
+type Tag struct {
+	Name string
+}
+
+// Init inits the GitHub client
+func (g *ReleaseClient) Init() {
+	g.Client = github.NewClient(nil)
 }
 
 // GetLatestReleaseAsset returns the latest release asset
@@ -37,6 +43,39 @@ func (g *ReleaseClient) GetLatestReleaseAsset(owner, repo string) (ra *ReleaseAs
 		ra = &ReleaseAsset{
 			TagName: release.GetTagName(),
 			Body:    release.GetBody(),
+		}
+	}
+	return
+}
+
+// GetReleaseList returns a list of release
+func (g *ReleaseClient) GetReleaseList(owner, repo string, count int) (list []Release, err error) {
+	ctx := context.Background()
+
+	var releaseList []*github.RepositoryRelease
+	if releaseList, _, err = g.Client.Repositories.ListReleases(ctx, owner, repo, &github.ListOptions{PerPage: count}); err == nil {
+		for i := range releaseList {
+			release := releaseList[i]
+			list = append(list, Release{
+				TagName: *release.Name,
+				ID:      *release.ID,
+			})
+		}
+	}
+	return
+}
+
+// GetTagList returns a list of tag
+func (g *ReleaseClient) GetTagList(owner, repo string, count int) (list []Tag, err error) {
+	ctx := context.Background()
+
+	var tagList []*github.RepositoryTag
+	if tagList, _, err = g.Client.Repositories.ListTags(ctx, owner, repo, &github.ListOptions{PerPage: count}); err == nil {
+		for i := range tagList {
+			tag := tagList[i]
+			list = append(list, Tag{
+				Name: *tag.Name,
+			})
 		}
 	}
 	return
