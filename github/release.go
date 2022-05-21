@@ -2,6 +2,11 @@ package github
 
 import (
 	"context"
+	"net/http"
+	"os"
+
+	"golang.org/x/oauth2"
+
 	"github.com/google/go-github/v29/github"
 )
 
@@ -31,7 +36,16 @@ type Tag struct {
 
 // Init inits the GitHub client
 func (g *ReleaseClient) Init() {
-	g.Client = github.NewClient(nil)
+	token := os.Getenv("GITHUB_TOKEN")
+	var tc *http.Client
+	if token != "" {
+		ctx := context.Background()
+		ts := oauth2.StaticTokenSource(
+			&oauth2.Token{AccessToken: token},
+		)
+		tc = oauth2.NewClient(ctx, ts)
+	}
+	g.Client = github.NewClient(tc)
 }
 
 // GetLatestReleaseAsset returns the latest release asset
