@@ -3,7 +3,7 @@ module github.com/linuxsuren/cobra-extension
 go 1.16
 
 require (
-	github.com/golang/mock v1.5.0
+	github.com/golang/mock v1.6.0
 	github.com/google/go-github/v29 v29.0.3
 	github.com/linuxsuren/http-downloader v0.0.23
 	github.com/mitchellh/go-homedir v1.1.0
